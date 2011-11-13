@@ -1,0 +1,7 @@
+PoC as seen on my talk @tapeup (http://www.ustream.tv/recorded/18455566)
+
+No time for further explainations. Code talks for itself.
+
+Kudos to atduskgreg for his skelestreamer (https://github.com/atduskgreg/Skelestreamer)! It's basiclly a simpleopenni->json (via tcp) streamer written for processing.org)
+
+Have fun!

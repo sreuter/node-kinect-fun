@@ -1,0 +1,147 @@
+<html> 
+<head>
+  <script src="http://localhost:5000/socket.io/socket.io.js"></script>
+  <script>
+    var socket = io.connect('http://localhost:5000');
+    socket.on('kinect', function (data) {            
+      renderBody(data);
+    });
+  </script>
+  <script type="application/javascript">
+  
+    function renderBody(b) {
+      var canvas = document.getElementById("canvas");
+      canvas.width = canvas.width + 1;
+      canvas.width = canvas.width - 1;
+
+      if (canvas.getContext)
+        {
+
+          /*
+            The following is based on my knowledge i gathered a long, long time ago...
+
+            See yourself: http://www.youtube.com/watch?v=kHgRlsOvN3M
+
+          */
+                           
+          var connections = [
+            ["neck","rightShoulder"],
+            ["rightShoulder","rightElbow"],
+            ["rightElbow","rightHand"],
+            ["neck","leftShoulder"],
+            ["leftShoulder","leftElbow"],
+            ["leftElbow","leftHand"],
+            ["neck","torso"],
+            ["torso","rightHip"],
+            ["rightHip","rightKnee"],
+            ["rightKnee","rightFoot"],
+            ["torso","leftHip"],
+            ["leftHip","leftKnee"],
+            ["leftKnee","leftFoot"],
+            ["head","neck"]
+          ];
+          
+          var correction = -1;
+
+          // Draw the sticky dude based on the JSON data. Dirty but effective ;-) 
+        
+          for(var i in connections) {
+
+            var element = canvas.getContext("2d")
+                element.lineWidth = 32.0;
+                element.lineCap = "round";
+            
+            var pos1_x = ((b[connections[i][1]].x+1000)/2),
+                pos1_y = (1000-(b[connections[i][1]].y))/2,
+                pos2_x = ((b[connections[i][0]].x+1000)/2),
+                pos2_y =(1000-(b[connections[i][0]].y))/2
+            
+            element.moveTo(pos1_x,pos1_y);
+            element.lineTo(pos2_x,pos2_y);
+            element.stroke();
+
+            // Rendering Zig Zag's Head on top!
+            
+            if(connections[i][0] === 'head') {
+              var limbLength = Math.sqrt((Math.pow((b[connections[i][0]].x)-(b[connections[i][1]].x), 2) + Math.pow((b[connections[i][0]].y)-(b[connections[i][1]].y), 2)));
+              var img=new Image();
+              img.src='img/' + connections[i][0] + '-' + connections[i][1] + '.png';
+              element.drawImage(img,pos2_x-(img.width),pos2_y-(img.height),img.width*(1/img.height*limbLength),limbLength);
+            }                        
+          }
+                                              
+       }
+     }
+     
+  </script>
+</head>
+<canvas id="canvas" width="1000" height="1000"></canvas><br>
+</body>
+</html>
+
+<!--
+
+      Sample JSON:
+
+      var b = {
+	      "project" : "skelestreamer",
+	      "session" : "SK3.6743283A76.5057A76.19583A",
+	      "head" : {
+	        "x":-191.41692, "y":696.2653,"z":2296.8206
+	      },"neck" : {
+	        "x":-181.56122, "y":461.1582,"z":2320.281
+	      },"rightShoulder" :
+	        {"x":-7.2304125, "y":470.31976,"z":2341.8667
+	      },
+	      "rightElbow" :
+	        {"x":242.27779, "y":324.58887,"z":2230.6858
+	      },
+	      "rightHand" :
+	        {"x":279.13962, "y":597.67035,"z":2057.3179
+	      },
+	      "leftShoulder" :
+	        {"x":-355.89203, "y":451.99667,"z":2298.6953
+	      },
+	      "leftElbow" :
+	        {"x":-594.951, "y":290.74362,"z":2295.5166
+	      },
+	      "leftHand" :
+	        {"x":-686.1284, "y":545.03253,"z":2091.8022
+	      },
+	      "torso" :
+	        {"x":-171.75395, "y":213.48224,"z":2346.1177
+	      },
+	      "rightHip" :
+	        {"x":-45.607285, "y":-28.746603,"z":2382.5984
+	      },
+	      "rightKnee" :
+	        {"x":28.407782, "y":-520.29333,"z":2419.3005
+	      },
+	      "rightFoot" :
+	        {"x":77.33353, "y":-829.00684,"z":2415.7686
+	      },
+	      "leftHip" :
+	        {"x":-273.69217, "y":-41.214066,"z":2355.1985
+	      },
+	      "leftKnee" : {
+	        "x":-291.91415, "y":-535.0413,"z":2289.919
+	      },
+	      "leftFoot" : {
+	        "x":-297.70895, "y":-999.81116,"z":2406.7458
+	      }
+      }
+      
+      Don't ask:
+      
+            var limbLength = Math.sqrt((Math.pow((pos1_x)-(pos2_x), 2) + Math.pow((pos1_y)-(pos2_y), 2)));
+            
+            var a = (pos2_x - pos1_x),
+                c = (pos2_y - pos1_y),
+                n = Math.pow(a,2) + Math.pow(c,2) - Math.pow(limbLength,2),
+                m = 2*a*c,
+                degree = Math.acos(n/m);
+            
+            console.log(m + ":" + n);
+            
+      
+-->
